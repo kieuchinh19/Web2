@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head th:replace="~{admin/layout :: head('Quản lý danh mục')}"></head>
+<body class="admin-body">
+<aside th:replace="~{admin/layout :: sidebar}"></aside>
+
+<div class="admin-main">
+    <header th:replace="~{admin/layout :: topbar('Quản lý danh mục')}"></header>
+    <main class="admin-content">
+
+        <div th:if="${message}" class="alert alert-success">
+            <i class="fas fa-check-circle"></i> <span th:text="${message}"></span>
+        </div>
+        <div th:if="${error}" class="alert alert-error">
+            <i class="fas fa-exclamation-circle"></i> <span th:text="${error}"></span>
+        </div>
+
+        <div class="page-header">
+            <div>
+                <h2 style="font-size:18px;font-weight:700;">Danh sách danh mục</h2>
+                <p style="font-size:12px;color:var(--text-muted);">
+                    Tổng cộng <b th:text="${totalItems}">0</b> danh mục
+                </p>
+            </div>
+            <div style="display:flex; gap:8px;">
+                <a th:href="@{/admin/categories/trash}" class="btn btn-secondary">
+                    <i class="fas fa-trash-restore"></i> Thùng rác
+                </a>
+                <button class="btn btn-primary" onclick="openCategoryModal()">
+                    <i class="fas fa-plus"></i> Thêm danh mục
+                </button>
+            </div>
+        </div>
+
+        <div class="card">
+            <form class="toolbar" th:action="@{/admin/categories}" method="get">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" name="keyword" th:value="${keyword}" placeholder="Tìm theo tên danh mục...">
+                </div>
+                <input type="hidden" name="size" th:value="${pageSize}">
+                <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-search"></i> Tìm</button>
+                <a th:href="@{/admin/categories}" class="btn btn-secondary btn-sm"><i class="fas fa-redo"></i> Reset</a>
+            </form>
+
+            <div class="table-wrapper">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th style="width:60px">ID</th>
+                            <th>Tên danh mục</th>
+                            <th>Slug</th>
+                            <th>Mô tả</th>
+                            <th>Số sản phẩm</th>
+                            <th>Ngày tạo</th>
+                            <th style="width:130px">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="c : ${categories}">
+                            <td class="id-cell" th:text="${c.id}">1</td>
+                            <td><div class="product-name" th:text="${c.name}">Tên</div></td>
+                            <td><code style="background:var(--primary-light);padding:3px 8px;border-radius:6px;font-size:12px;color:var(--primary-dark);" th:text="${c.slug}">slug</code></td>
+                            <td th:text="${#strings.abbreviate(c.description, 50)}">Mô tả</td>
+                            <td><span class="badge badge-info" th:text="${c.productCount} + ' SP'">0 SP</span></td>
+                            <td th:text="${c.createdAt != null ? #temporals.format(c.createdAt,'dd/MM/yyyy') : '-'}">-</td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="icon-btn edit" th:onclick="'openCategoryModal(' + ${c.id} + ')'" title="Sửa">
+                                        <i class="fas fa-pen"></i>
+                                    </button>
+                                    <form th:action="@{/admin/categories/delete/{id}(id=${c.id})}" method="post" style="display:inline"
+                                          onsubmit="return confirmDelete('Danh mục sẽ được chuyển vào thùng rác. Bạn có chắc muốn xóa?');">
+                                        <button type="submit" class="icon-btn delete" title="Xóa (chuyển vào thùng rác)">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr th:if="${categories == null or categories.empty}">
+                            <td colspan="7">
+                                <div class="empty-state">
+                                    <i class="fas fa-tags"></i>
+                                    <h4>Chưa có danh mục nào</h4>
+                                    <p>Nhấn "Thêm danh mục" để tạo mới</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination" th:if="${totalPages > 1}">
+                <a th:href="@{/admin/categories(page=0, size=${pageSize}, keyword=${keyword})}"
+                    th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                    <i class="fas fa-angle-double-left"></i>
+                </a>
+                <a th:href="@{/admin/categories(page=${currentPage - 1}, size=${pageSize}, keyword=${keyword})}"
+                    th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                    <i class="fas fa-angle-left"></i>
+                </a>
+                <span th:each="i : ${#numbers.sequence(pageStart, pageEnd)}">
+                    <a th:href="@{/admin/categories(page=${i}, size=${pageSize}, keyword=${keyword})}"
+                        th:classappend="${i == currentPage} ? 'active' : ''" th:text="${i + 1}">1</a>
+                </span>
+                <a th:href="@{/admin/categories(page=${currentPage + 1}, size=${pageSize}, keyword=${keyword})}"
+                    th:classappend="${currentPage + 1 >= totalPages} ? 'disabled' : ''">
+                    <i class="fas fa-angle-right"></i>
+                </a>
+                <a th:href="@{/admin/categories(page=${totalPages - 1}, size=${pageSize}, keyword=${keyword})}"
+                    th:classappend="${currentPage + 1 >= totalPages} ? 'disabled' : ''">
+                    <i class="fas fa-angle-double-right"></i>
+                </a>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="categoryModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 id="categoryModalTitle">Thêm danh mục mới</h3>
+            <button class="modal-close" data-close-modal><i class="fas fa-times"></i></button>
+        </div>
+        <form id="categoryForm" th:action="@{/admin/categories/save}" method="post">
+            <input type="hidden" name="id" id="categoryId">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Tên danh mục *</label>
+                    <input class="form-control" name="name" id="categoryName" required>
+                </div>
+                <div class="form-group">
+                    <label>Slug (để trống sẽ tự sinh)</label>
+                    <input class="form-control" name="slug" id="categorySlug" placeholder="ten-danh-muc">
+                </div>
+                <div class="form-group">
+                    <label>Mô tả</label>
+                    <textarea class="form-control" name="description" id="categoryDescription" rows="3"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-close-modal>Hủy</button>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Lưu</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<th:block th:replace="~{admin/layout :: modalScripts}"></th:block>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const categoriesData = /*[[${categories}]]*/ [];
+    function openCategoryModal(id) {
+        document.getElementById('categoryForm').reset();
+        document.getElementById('categoryId').value = '';
+        document.getElementById('categoryModalTitle').textContent = 'Thêm danh mục mới';
+        if (id) {
+            const c = categoriesData.find(x => x.id === id);
+            if (c) {
+                document.getElementById('categoryModalTitle').textContent = 'Sửa danh mục #' + id;
+                document.getElementById('categoryId').value = c.id || '';
+                document.getElementById('categoryName').value = c.name || '';
+                document.getElementById('categorySlug').value = c.slug || '';
+                document.getElementById('categoryDescription').value = c.description || '';
+            }
+        }
+        openModal('categoryModal');
+    }
+    /*]]>*/
+</script>
+</body>
+</html>

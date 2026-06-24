@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+
+<head th:replace="~{admin/layout :: head('Quản lý đơn hàng')}"></head>
+
+<body class="admin-body">
+    <aside th:replace="~{admin/layout :: sidebar}"></aside>
+
+    <div class="admin-main">
+        <header th:replace="~{admin/layout :: topbar('Quản lý đơn hàng')}"></header>
+        <main class="admin-content">
+
+
+            <div class="card">
+                <form class="toolbar" th:action="@{/admin/orders}" method="get">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" name="keyword" th:value="${keyword}"
+                            placeholder="Tìm theo mã đơn hoặc tên khách...">
+                    </div>
+                    <select name="status" onchange="this.form.submit()">
+                        <option value="">Tất cả trạng thái</option>
+                        <option value="PENDING" th:selected="${status=='PENDING'}">Chờ xác nhận</option>
+                        <option value="CONFIRMED" th:selected="${status=='CONFIRMED'}">Đã xác nhận</option>
+                        <option value="SHIPPING" th:selected="${status=='SHIPPING'}">Đang giao</option>
+                        <option value="COMPLETED" th:selected="${status=='COMPLETED'}">Hoàn thành</option>
+                        <option value="CANCELLED" th:selected="${status=='CANCELLED'}">Đã hủy</option>
+                    </select>
+                    <button type="submit" class="btn btn-secondary btn-sm"><i class="fas fa-filter"></i> Lọc</button>
+                    <a th:href="@{/admin/orders}" class="btn btn-secondary btn-sm"><i class="fas fa-redo"></i> Reset</a>
+                </form>
+
+                <div class="table-wrapper">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Mã đơn</th>
+                                <th>Khách hàng</th>
+                                <th>SĐT</th>
+                                <th>Tổng tiền</th>
+                                <th>Số SP</th>
+                                <th>Thanh toán</th>
+                                <th>Trạng thái</th>
+                                <th>Ngày đặt</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="o : ${orders}">
+                                <td class="id-cell" th:text="${o.orderCode}">ORD001</td>
+                                <td>
+                                    <div class="product-name" th:text="${o.fullName}">Tên</div>
+                                    <div class="product-desc" th:text="${o.username}">username</div>
+                                </td>
+                                <td th:text="${o.phone}">-</td>
+                                <td class="price"
+                                    th:text="${#numbers.formatDecimal(o.totalAmount, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ
+                                </td>
+                                <td><span class="badge badge-secondary"
+                                        th:text="${o.items != null ? o.items.size() : 0} + ' SP'">0 SP</span></td>
+                                <td>
+                                    <span
+                                        th:classappend="${o.paymentStatus.name()=='PAID'} ? 'badge badge-success' : (${o.paymentStatus.name()=='UNPAID'} ? 'badge badge-warning' : 'badge badge-info')"
+                                        th:text="${o.paymentMethod} + ' / ' + ${o.paymentStatus}">COD</span>
+                                </td>
+                                <td>
+                                    <form th:action="@{/admin/orders/update-status/{id}(id=${o.id})}" method="post"
+                                        style="display:inline">
+                                        <select name="status" class="status-select" onchange="this.form.submit()">
+                                            <option value="PENDING" th:selected="${o.status.name()=='PENDING'}">Chờ xác
+                                                nhận</option>
+                                            <option value="CONFIRMED" th:selected="${o.status.name()=='CONFIRMED'}">Đã
+                                                xác nhận</option>
+                                            <option value="SHIPPING" th:selected="${o.status.name()=='SHIPPING'}">Đang
+                                                giao</option>
+                                            <option value="COMPLETED" th:selected="${o.status.name()=='COMPLETED'}">Hoàn
+                                                thành</option>
+                                            <option value="CANCELLED" th:selected="${o.status.name()=='CANCELLED'}">Đã
+                                                hủy</option>
+                                        </select>
+                                    </form>
+                                </td>
+                                <td
+                                    th:text="${o.orderDate != null ? #temporals.format(o.orderDate,'dd/MM/yyyy HH:mm') : '-'}">
+                                    -</td>
+                                <td>
+                                    <div class="action-btns">
+                                        <a th:href="@{/admin/orders/{id}(id=${o.id})}" class="icon-btn view"
+                                            title="Xem chi tiết">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${orders.empty}">
+                                <td colspan="9">
+                                    <div class="empty-state">
+                                        <i class="fas fa-shopping-bag"></i>
+                                        <h4>Chưa có đơn hàng nào</h4>
+                                        <p>Đơn hàng sẽ hiển thị tại đây</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+    <th:block th:replace="~{admin/layout :: modalScripts}"></th:block>
+</body>
+
+</html>

@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+
+<head th:replace="~{admin/layout :: head('Quản lý sản phẩm')}"></head>
+
+<body class="admin-body">
+    <aside th:replace="~{admin/layout :: sidebar}"></aside>
+
+    <div class="admin-main">
+        <header th:replace="~{admin/layout :: topbar('Quản lý sản phẩm')}"></header>
+        <main class="admin-content">
+
+            <div th:if="${message}" class="alert alert-success">
+                <i class="fas fa-check-circle"></i> <span th:text="${message}"></span>
+            </div>
+            <div th:if="${error}" class="alert alert-error">
+                <i class="fas fa-exclamation-circle"></i> <span th:text="${error}"></span>
+            </div>
+
+            <div class="page-header">
+                <div>
+                    <h2 style="font-size:18px;font-weight:700;">Danh sách sản phẩm</h2>
+                    <p style="font-size:12px;color:var(--text-muted);">
+                        Tổng cộng <b th:text="${totalItems}">0</b> sản phẩm
+                    </p>
+                </div>
+                <div style="display:flex; gap:8px;">
+                    <a th:href="@{/admin/products/trash}" class="btn btn-secondary">
+                        <i class="fas fa-trash-restore"></i> Thùng rác
+                    </a>
+                    <button class="btn btn-primary" onclick="openProductModal()">
+                        <i class="fas fa-plus"></i> Thêm sản phẩm
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <form class="toolbar" th:action="@{/admin/products}" method="get">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" name="keyword" th:value="${keyword}"
+                            placeholder="Tìm theo tên hoặc mô tả...">
+                    </div>
+                    <select name="categoryId">
+                        <option value="">Tất cả danh mục</option>
+                        <option th:each="c : ${categories}" th:value="${c.id}" th:text="${c.name}"
+                            th:selected="${selectedCategoryId != null and selectedCategoryId == c.id}"></option>
+                    </select>
+                    <select name="brandId">
+                        <option value="">Tất cả thương hiệu</option>
+                        <option th:each="b : ${brands}" th:value="${b.id}" th:text="${b.name}"
+                            th:selected="${selectedBrandId != null and selectedBrandId == b.id}"></option>
+                    </select>
+                    <input type="hidden" name="size" th:value="${pageSize}">
+                    <button type="submit" class="btn btn-primary btn-sm">
+                        <i class="fas fa-search"></i> Tìm kiếm
+                    </button>
+                    <a th:href="@{/admin/products}" class="btn btn-secondary btn-sm">
+                        <i class="fas fa-redo"></i> Reset
+                    </a>
+                </form>
+
+                <div class="table-wrapper">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th style="width:60px">ID</th>
+                                <th style="width:80px">Ảnh</th>
+                                <th>Tên sản phẩm</th>
+                                <th>Danh mục</th>
+                                <th>Thương hiệu</th>
+                                <th>Giá</th>
+                                <th>Số lượng</th>
+                                <th style="width:130px">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="p : ${products}">
+                                <td class="id-cell" th:text="${p.id}">1</td>
+                                <td>
+                                    <img class="product-img" th:src="${p.image}"
+                                        onerror="this.src='https://via.placeholder.com/48x48/fdf2f8/ec4899?text=IMG'"
+                                        alt="img">
+                                </td>
+                                <td>
+                                    <div class="product-name" th:text="${p.name}">Tên</div>
+                                    <div class="product-desc" th:text="${#strings.abbreviate(p.description, 50)}">Mô tả
+                                    </div>
+                                </td>
+                                <td><span class="badge badge-info" th:text="${p.categoryName}">DM</span></td>
+                                <td><span class="badge badge-secondary" th:text="${p.brandName}">TH</span></td>
+                                <td class="price"
+                                    th:text="${#numbers.formatDecimal(p.price, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ
+                                </td>
+                                <td>
+                                    <span
+                                        th:classappend="${p.quantity > 0} ? 'badge badge-success' : 'badge badge-danger'"
+                                        th:text="${p.quantity} + ' sp'">0</span>
+                                </td>
+                                <td>
+                                    <div class="action-btns">
+                                        <button class="icon-btn edit" th:onclick="'openProductModal(' + ${p.id} + ')'"
+                                            title="Sửa">
+                                            <i class="fas fa-pen"></i>
+                                        </button>
+                                        <form th:action="@{/admin/products/delete/{id}(id=${p.id})}" method="post"
+                                            style="display:inline"
+                                            onsubmit="return confirmDelete('Sản phẩm sẽ được chuyển vào thùng rác. Bạn có chắc muốn xóa?');">
+                                            <button type="submit" class="icon-btn delete" title="Xóa (chuyển vào thùng rác)">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${products == null or products.empty}">
+                                <td colspan="8">
+                                    <div class="empty-state">
+                                        <i class="fas fa-box-open"></i>
+                                        <h4>Chưa có sản phẩm nào</h4>
+                                        <p>Nhấn "Thêm sản phẩm" để tạo mới</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- PHAN TRANG -->
+                <div class="pagination" th:if="${totalPages > 1}">
+                    <a th:if="${currentPage > 0}"
+                        th:href="@{/admin/products(page=${currentPage - 1}, size=${pageSize}, keyword=${keyword}, categoryId=${selectedCategoryId}, brandId=${selectedBrandId})}">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+
+                    <a th:if="${pageStart > 0}"
+                        th:href="@{/admin/products(page=0, size=${pageSize}, keyword=${keyword}, categoryId=${selectedCategoryId}, brandId=${selectedBrandId})}">1</a>
+                    <span th:if="${pageStart > 1}">...</span>
+
+                    <th:block th:each="i : ${#numbers.sequence(pageStart, pageEnd)}">
+                        <a th:if="${i != currentPage}"
+                            th:href="@{/admin/products(page=${i}, size=${pageSize}, keyword=${keyword}, categoryId=${selectedCategoryId}, brandId=${selectedBrandId})}"
+                            th:text="${i + 1}">1</a>
+                        <span th:if="${i == currentPage}" class="active" th:text="${i + 1}">1</span>
+                    </th:block>
+
+                    <span th:if="${pageEnd < totalPages - 1}">...</span>
+                    <a th:if="${pageEnd < totalPages - 1}"
+                        th:href="@{/admin/products(page=${totalPages - 1}, size=${pageSize}, keyword=${keyword}, categoryId=${selectedCategoryId}, brandId=${selectedBrandId})}"
+                        th:text="${totalPages}">10</a>
+
+                    <a th:if="${currentPage < totalPages - 1}"
+                        th:href="@{/admin/products(page=${currentPage + 1}, size=${pageSize}, keyword=${keyword}, categoryId=${selectedCategoryId}, brandId=${selectedBrandId})}">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal-overlay" id="productModal">
+        <div class="modal modal-lg">
+            <div class="modal-header">
+                <h3 id="productModalTitle">Thêm sản phẩm mới</h3>
+                <button class="modal-close" data-close-modal><i class="fas fa-times"></i></button>
+            </div>
+            <form id="productForm" th:action="@{/admin/products/save}" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="id" id="productId">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Tên sản phẩm *</label>
+                        <input class="form-control" name="name" id="productName" required minlength="2" maxlength="200">
+                    </div>
+                    <div class="form-group">
+                        <label>Mô tả</label>
+                        <textarea class="form-control" name="description" id="productDescription" rows="3"
+                            maxlength="1000"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Giá (VNĐ) *</label>
+                            <input class="form-control" type="number" name="price" id="productPrice" min="0" step="1000"
+                                required>
+                        </div>
+                        <div class="form-group">
+                            <label>Số lượng *</label>
+                            <input class="form-control" type="number" name="quantity" id="productQuantity" min="0"
+                                required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Danh mục</label>
+                            <select class="form-control" name="categoryId" id="productCategory">
+                                <option value="">-- Chọn danh mục --</option>
+                                <option th:each="c : ${categories}" th:value="${c.id}" th:text="${c.name}"></option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Thương hiệu</label>
+                            <select class="form-control" name="brandId" id="productBrand">
+                                <option value="">-- Chọn thương hiệu --</option>
+                                <option th:each="b : ${brands}" th:value="${b.id}" th:text="${b.name}"></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Hình ảnh sản phẩm</label>
+                        <div class="image-upload">
+                            <div class="image-preview" id="imagePreview">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <span>Chưa có ảnh</span>
+                            </div>
+                            <div class="image-upload-actions">
+                                <label class="btn btn-secondary btn-sm" for="imageFileInput">
+                                    <i class="fas fa-upload"></i> Chọn file
+                                </label>
+                                <input type="file" id="imageFileInput" name="imageFile" accept="image/*"
+                                    style="display:none" onchange="handleImageFile(this)">
+                                <span style="margin:0 6px;color:#888;">hoặc</span>
+                                <input type="text" name="imageUrl" id="productImageUrl" class="form-control"
+                                    style="flex:1;min-width:180px;" placeholder="Dán URL ảnh (https://...)"
+                                    oninput="handleImageUrl(this.value)">
+                            </div>
+                        </div>
+                        <input type="hidden" name="image" id="productImage">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-close-modal>Hủy</button>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <th:block th:replace="~{admin/layout :: modalScripts}"></th:block>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const productsData = /*[[${products}]]*/[];
+
+        function openProductModal(id) {
+            const form = document.getElementById('productForm');
+            form.reset();
+            document.getElementById('productId').value = '';
+            document.getElementById('productImage').value = '';
+            document.getElementById('productImageUrl').value = '';
+            document.getElementById('imageFileInput').value = '';
+            document.getElementById('productModalTitle').textContent = 'Thêm sản phẩm mới';
+            resetImagePreview();
+
+            if (id) {
+                const p = productsData.find(x => x.id === id);
+                if (p) {
+                    document.getElementById('productModalTitle').textContent = 'Sửa sản phẩm #' + id;
+                    document.getElementById('productId').value = p.id || '';
+                    document.getElementById('productName').value = p.name || '';
+                    document.getElementById('productDescription').value = p.description || '';
+                    document.getElementById('productPrice').value = p.price || '';
+                    document.getElementById('productQuantity').value = p.quantity || 0;
+                    document.getElementById('productImage').value = p.image || '';
+                    document.getElementById('productImageUrl').value = p.image || '';
+                    if (p.category) document.getElementById('productCategory').value = p.category.id || '';
+                    if (p.brand) document.getElementById('productBrand').value = p.brand.id || '';
+                    if (p.image) showImagePreview(p.image);
+                }
+            }
+            openModal('productModal');
+        }
+
+        function resetImagePreview() {
+            const preview = document.getElementById('imagePreview');
+            preview.innerHTML = '<i class="fas fa-cloud-upload-alt"></i><span>Chưa có ảnh</span>';
+            preview.classList.remove('has-image');
+        }
+
+        function showImagePreview(url) {
+            if (!url) { resetImagePreview(); return; }
+            const preview = document.getElementById('imagePreview');
+            preview.innerHTML = '<img src="' + url + '" alt="preview" onerror="resetImagePreview()">';
+            preview.classList.add('has-image');
+        }
+
+        function handleImageFile(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    showImagePreview(e.target.result);
+                    document.getElementById('productImage').value = '';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function handleImageUrl(url) {
+            document.getElementById('productImage').value = url;
+            if (url && url.trim().length > 0) showImagePreview(url.trim());
+            else resetImagePreview();
+        }
+        /*]]>*/
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head th:replace="~{admin/layout :: head('Thùng rác - Thương hiệu')}"></head>
+<body class="admin-body">
+    <aside th:replace="~{admin/layout :: sidebar}"></aside>
+    <div class="admin-main">
+        <header th:replace="~{admin/layout :: topbar('Thùng rác thương hiệu')}"></header>
+        <main class="admin-content">
+            <div th:if="${message}" class="alert alert-success">
+                <i class="fas fa-check-circle"></i> <span th:text="${message}"></span>
+            </div>
+            <div th:if="${error}" class="alert alert-error">
+                <i class="fas fa-exclamation-circle"></i> <span th:text="${error}"></span>
+            </div>
+
+            <div class="page-header">
+                <div>
+                    <h2 style="font-size:18px;font-weight:700;">
+                        <i class="fas fa-trash-restore" style="color:#e11d48;"></i>
+                        Thùng rác thương hiệu
+                    </h2>
+                    <p style="font-size:12px;color:var(--text-muted);">
+                        Có <b th:text="${totalItems}">0</b> thương hiệu đã xóa tạm.
+                        Bạn có thể khôi phục hoặc xóa vĩnh viễn.
+                    </p>
+                </div>
+                <a th:href="@{/admin/brands}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Quay lại danh sách
+                </a>
+            </div>
+
+            <div class="card">
+                <form class="toolbar" th:action="@{/admin/brands/trash}" method="get">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" name="keyword" th:value="${keyword}"
+                            placeholder="Tìm thương hiệu đã xóa theo tên...">
+                    </div>
+                    <input type="hidden" name="size" th:value="${pageSize}">
+                    <button type="submit" class="btn btn-primary btn-sm">
+                        <i class="fas fa-search"></i> Tìm kiếm
+                    </button>
+                    <a th:href="@{/admin/brands/trash}" class="btn btn-secondary btn-sm">
+                        <i class="fas fa-redo"></i> Reset
+                    </a>
+                </form>
+
+                <div class="table-wrapper">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th style="width:60px">ID</th>
+                                <th style="width:80px">Logo</th>
+                                <th>Tên thương hiệu</th>
+                                <th>Xuất xứ</th>
+                                <th>Mô tả</th>
+                                <th style="width:170px">Ngày xóa</th>
+                                <th style="width:200px">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="b : ${brands}">
+                                <td class="id-cell" th:text="${b.id}">1</td>
+                                <td>
+                                    <img class="product-img" th:src="${b.logo}"
+                                        onerror="this.src='https://via.placeholder.com/48x48/fdf2f8/ec4899?text=LOGO'"
+                                        alt="logo" style="opacity:0.6;">
+                                </td>
+                                <td>
+                                    <div class="product-name" th:text="${b.name}" style="color:#888;">Tên</div>
+                                </td>
+                                <td>
+                                    <span class="badge badge-secondary" th:text="${b.country}">Xuất xứ</span>
+                                </td>
+                                <td>
+                                    <div class="product-desc" th:text="${#strings.abbreviate(b.description, 60)}">
+                                        Mô tả
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge badge-danger" th:if="${b.deletedAt != null}">
+                                        <i class="fas fa-clock"></i>
+                                        <span th:text="${#temporals.format(b.deletedAt, 'dd/MM/yyyy HH:mm')}"></span>
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="action-btns">
+                                        <form th:action="@{/admin/brands/trash/restore/{id}(id=${b.id})}"
+                                            method="post" style="display:inline"
+                                            onsubmit="return confirmRestore();">
+                                            <button type="submit" class="icon-btn edit" title="Khôi phục">
+                                                <i class="fas fa-undo"></i>
+                                            </button>
+                                        </form>
+                                        <form th:action="@{/admin/brands/trash/hard-delete/{id}(id=${b.id})}"
+                                            method="post" style="display:inline"
+                                            onsubmit="return confirmHardDelete();">
+                                            <button type="submit" class="icon-btn delete" title="Xóa vĩnh viễn">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${brands.empty}">
+                                <td colspan="7">
+                                    <div class="empty-state">
+                                        <i class="fas fa-trash-restore"></i>
+                                        <h4>Thùng rác trống</h4>
+                                        <p>Không có thương hiệu nào đã bị xóa.</p>
+                                        <a th:href="@{/admin/brands}" class="btn btn-primary btn-sm"
+                                            style="margin-top:12px;">
+                                            <i class="fas fa-arrow-left"></i> Về danh sách thương hiệu
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="pagination" th:if="${totalPages > 1}">
+                    <a th:href="@{/admin/brands/trash(page=0, size=${pageSize}, keyword=${keyword})}"
+                        th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                        <i class="fas fa-angle-double-left"></i>
+                    </a>
+                    <a th:href="@{/admin/brands/trash(page=${currentPage - 1}, size=${pageSize}, keyword=${keyword})}"
+                        th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                        <i class="fas fa-angle-left"></i>
+                    </a>
+                    <span th:each="i : ${#numbers.sequence(pageStart, pageEnd)}">
+                        <a th:href="@{/admin/brands/trash(page=${i}, size=${pageSize}, keyword=${keyword})}"
+                            th:classappend="${i == currentPage} ? 'active' : ''" th:text="${i + 1}">1</a>
+                    </span>
+                    <a th:href="@{/admin/brands/trash(page=${currentPage + 1}, size=${pageSize}, keyword=${keyword})}"
+                        th:classappend="${currentPage + 1 >= totalPages} ? 'disabled' : ''">
+                        <i class="fas fa-angle-right"></i>
+                    </a>
+                    <a th:href="@{/admin/brands/trash(page=${totalPages - 1}, size=${pageSize}, keyword=${keyword})}"
+                        th:classappend="${currentPage + 1 >= totalPages} ? 'disabled' : ''">
+                        <i class="fas fa-angle-double-right"></i>
+                    </a>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <th:block th:replace="~{admin/layout :: modalScripts}"></th:block>
+    <script>
+        function confirmRestore() {
+            return confirm('Bạn có chắc muốn khôi phục thương hiệu này?');
+        }
+        function confirmHardDelete() {
+            return confirm('CẢNH BÁO: Thương hiệu sẽ bị xóa VĨNH VIỄN khỏi database!\nBạn có chắc chắn muốn xóa?');
+        }
+    </script>
+</body>
+</html>

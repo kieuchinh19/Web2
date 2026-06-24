@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+
+<head th:replace="~{admin/layout :: head('Chi tiết đơn hàng')}"></head>
+
+<body>
+    <aside th:replace="~{admin/layout :: sidebar}"></aside>
+    <header class="main" th:replace="~{admin/layout :: topbar('Chi tiết đơn hàng')}"></header>
+
+    <main class="main" style="margin-top:-65px;padding-top:95px;">
+        <div class="content">
+            <div style="margin-bottom:15px;">
+                <a th:href="@{/admin/orders}" style="color:#e91e63;text-decoration:none;"><i
+                        class="fas fa-arrow-left"></i> Quay lại</a>
+            </div>
+
+            <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px;">
+                <!-- Thông tin đơn -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-receipt"></i> Đơn hàng: <span th:text="${order.orderCode}">ORD001</span>
+                        </h2>
+                        <span
+                            th:class="${order.status.name()=='COMPLETED' ? 'badge badge-success' : (${order.status.name()=='CANCELLED'} ? 'badge badge-danger' : 'badge badge-warning')}"
+                            th:text="${order.status}">PENDING</span>
+                    </div>
+
+                    <h3 style="margin-bottom:15px;color:#555;">Sản phẩm</h3>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Ảnh</th>
+                                <th>Sản phẩm</th>
+                                <th>Đơn giá</th>
+                                <th>SL</th>
+                                <th>Thành tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="item : ${order.items}">
+                                <td><img th:src="${item.productImage}" alt="img"
+                                        style="width:50px;height:50px;border-radius:8px;object-fit:cover;"></td>
+                                <td th:text="${item.productName}">Name</td>
+                                <td th:text="${#numbers.formatDecimal(item.price,0,'COMMA',0,'POINT')} + 'đ'">0đ</td>
+                                <td th:text="${item.quantity}">1</td>
+                                <td style="color:#e91e63;font-weight:600;"
+                                    th:text="${#numbers.formatDecimal(item.subtotal,0,'COMMA',0,'POINT')} + 'đ'">0đ</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div style="margin-top:20px;text-align:right;">
+                        <p>Tổng phụ: <strong
+                                th:text="${#numbers.formatDecimal(order.totalAmount,0,'COMMA',0,'POINT')} + 'đ'">0đ</strong>
+                        </p>
+                        <p>Phí ship: <strong
+                                th:text="${#numbers.formatDecimal(order.shippingFee,0,'COMMA',0,'POINT')} + 'đ'">0đ</strong>
+                        </p>
+                        <p>Giảm giá: <strong
+                                th:text="${#numbers.formatDecimal(order.discountAmount,0,'COMMA',0,'POINT')} + 'đ'">0đ</strong>
+                        </p>
+                        <h3 style="color:#e91e63;margin-top:10px;">Tổng cộng: <span
+                                th:text="${#numbers.formatDecimal(order.totalAmount,0,'COMMA',0,'POINT')} + 'đ'">0đ</span>
+                        </h3>
+                    </div>
+                </div>
+
+                <!-- Thông tin khách hàng -->
+                <div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h2><i class="fas fa-user"></i> Khách hàng</h2>
+                        </div>
+                        <p><strong>Họ tên:</strong> <span th:text="${order.fullName}">-</span></p>
+                        <p><strong>Username:</strong> <span th:text="${order.username}">-</span></p>
+                        <p><strong>SĐT:</strong> <span th:text="${order.phone}">-</span></p>
+                        <p><strong>Email:</strong> <span th:text="${order.email}">-</span></p>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h2><i class="fas fa-truck"></i> Giao hàng</h2>
+                        </div>
+                        <p><strong>Địa chỉ:</strong> <span th:text="${order.shippingAddress}">-</span></p>
+                        <p><strong>Ghi chú:</strong> <span th:text="${order.note} ?: 'Không có'">-</span></p>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h2><i class="fas fa-credit-card"></i> Thanh toán</h2>
+                        </div>
+                        <p><strong>Phương thức:</strong> <span th:text="${order.paymentMethod}">COD</span></p>
+                        <p><strong>Trạng thái:</strong> <span th:text="${order.paymentStatus}">UNPAID</span></p>
+                        <p><strong>Ngày đặt:</strong> <span
+                                th:text="${order.orderDate != null ? #temporals.format(order.orderDate,'dd/MM/yyyy HH:mm') : '-'}">-</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>

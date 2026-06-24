@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Đăng nhập - Kiều Chinh Cosmetics</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600&display=swap');
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Be Vietnam Pro', 'Segoe UI', sans-serif;
+  background: #fce8ef;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px 20px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Card ── */
+.card {
+  width: 100%;
+  max-width: 1080px;
+  background: #fff;
+  border-radius: 28px;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  box-shadow: 0 24px 80px rgba(200,60,100,0.14);
+}
+
+/* ── LEFT ── */
+.left {
+  background: linear-gradient(160deg, #fde4ef 0%, #fce9f1 60%, #fde9f0 100%);
+  padding: 44px 40px 0 40px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* leaf decorations top right */
+.left::before {
+  content: '';
+  position: absolute;
+  top: -20px; right: -20px;
+  width: 160px; height: 160px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cellipse cx='130' cy='60' rx='55' ry='25' fill='%23f9a8c9' opacity='.55' transform='rotate(-30 130 60)'/%3E%3Cellipse cx='155' cy='100' rx='45' ry='18' fill='%23f9a8c9' opacity='.4' transform='rotate(-60 155 100)'/%3E%3Cellipse cx='100' cy='30' rx='40' ry='16' fill='%23f9a8c9' opacity='.35' transform='rotate(-10 100 30)'/%3E%3C/svg%3E") no-repeat center/cover;
+  pointer-events: none;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 32px;
+}
+.brand-logo {
+  width: 38px; height: 38px;
+}
+.brand-text {
+  display: flex; flex-direction: column; line-height: 1.1;
+}
+.brand-name {
+  font-size: 13px; font-weight: 800; letter-spacing: 0.1em;
+  color: #c8255c; text-transform: uppercase;
+}
+.brand-sub {
+  font-size: 10px; letter-spacing: 0.18em; color: #c8255c;
+  text-transform: uppercase; opacity: 0.75;
+}
+
+.welcome-italic {
+  font-size: 18px;
+  font-style: italic;
+  color: #d61f69;
+  font-weight: 600;
+  margin-bottom: 8px;
+  display: flex; align-items: center; gap: 8px;
+}
+.welcome-italic::after {
+  content: '♡';
+  font-style: normal;
+  font-size: 16px;
+}
+
+.hero-title {
+  font-size: 30px;
+  font-weight: 900;
+  line-height: 1.25;
+  color: #1e1020;
+  margin-bottom: 16px;
+}
+.hero-title em {
+  font-style: normal;
+  color: #e8195a;
+}
+
+.hero-sub {
+  font-size: 13.5px;
+  color: #7a5469;
+  line-height: 1.75;
+  max-width: 340px;
+  margin-bottom: 28px;
+}
+
+.features { display: flex; flex-direction: column; gap: 18px; margin-bottom: 32px; }
+.feature { display: flex; align-items: center; gap: 14px; }
+.feature-icon {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: rgba(232,25,90,0.12);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.feature-icon svg { width: 18px; height: 18px; }
+.feature-text strong { display: block; font-size: 14px; font-weight: 700; color: #1e1020; }
+.feature-text span { font-size: 12.5px; color: #8a6478; }
+
+/* product image area */
+.product-img-wrap {
+  margin-top: auto;
+  position: relative;
+  text-align: center;
+}
+.product-img-wrap img {
+  width: 100%;
+  max-width: 380px;
+  display: block;
+  margin: 0 auto;
+  object-fit: contain;
+  filter: drop-shadow(0 20px 40px rgba(200,60,100,0.18));
+}
+
+/* ── RIGHT ── */
+.right {
+  padding: 48px 44px;
+  background: #fff;
+  position: relative;
+}
+
+/* decorative blobs */
+.right::before {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 130px; height: 130px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 160'%3E%3Cellipse cx='110' cy='40' rx='50' ry='22' fill='%23f9a8c9' opacity='.5' transform='rotate(-25 110 40)'/%3E%3Cellipse cx='140' cy='80' rx='38' ry='16' fill='%23f9a8c9' opacity='.35' transform='rotate(-55 140 80)'/%3E%3C/svg%3E") no-repeat center/cover;
+  pointer-events: none;
+}
+
+.form-title {
+  font-size: 34px;
+  font-weight: 900;
+  color: #1e1020;
+  margin-bottom: 8px;
+}
+.form-sub {
+  font-size: 14px;
+  color: #8a6e82;
+  margin-bottom: 32px;
+  line-height: 1.65;
+}
+
+.field { margin-bottom: 20px; }
+.field-label {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #3a2740;
+  margin-bottom: 8px;
+  display: block;
+}
+.input-wrap {
+  position: relative;
+}
+.input-wrap .icon {
+  position: absolute;
+  left: 16px; top: 50%;
+  transform: translateY(-50%);
+  width: 20px; height: 20px;
+  color: #e8195a;
+  display: flex; align-items: center; justify-content: center;
+}
+.input-wrap input {
+  width: 100%;
+  padding: 15px 48px 15px 48px;
+  border: 1.5px solid #f0d5e3;
+  border-radius: 14px;
+  font-size: 14.5px;
+  font-family: inherit;
+  color: #1e1020;
+  background: #fff;
+  outline: none;
+  transition: border-color .2s, box-shadow .2s;
+}
+.input-wrap input::placeholder { color: #c4a3b5; }
+.input-wrap input:focus {
+  border-color: #e8195a;
+  box-shadow: 0 0 0 3px rgba(232,25,90,0.1);
+}
+.input-wrap .eye-btn {
+  position: absolute;
+  right: 16px; top: 50%;
+  transform: translateY(-50%);
+  background: none; border: none;
+  cursor: pointer; color: #c4a3b5;
+  display: flex; align-items: center;
+  padding: 0;
+}
+
+.options-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  flex-wrap: wrap; gap: 8px;
+}
+.checkbox-label {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13.5px; color: #5a3f55; cursor: pointer;
+  user-select: none;
+}
+.checkbox-label input[type="checkbox"] {
+  width: 18px; height: 18px;
+  accent-color: #e8195a;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.forgot-link {
+  font-size: 13.5px;
+  color: #e8195a;
+  font-weight: 600;
+  text-decoration: none;
+}
+.forgot-link:hover { text-decoration: underline; }
+
+.login-btn {
+  width: 100%;
+  padding: 16px;
+  background: #e8195a;
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  transition: background .2s, transform .15s, box-shadow .2s;
+  letter-spacing: 0.02em;
+}
+.login-btn:hover {
+  background: #c8155a;
+  transform: translateY(-1px);
+  box-shadow: 0 12px 36px rgba(232,25,90,0.3);
+}
+.login-btn svg { width: 18px; height: 18px; }
+
+.divider {
+  display: flex; align-items: center; gap: 14px;
+  margin: 26px 0;
+  font-size: 13px; color: #b08fa0;
+}
+.divider::before, .divider::after {
+  content: ''; flex: 1;
+  height: 1px; background: #f0dce8;
+}
+
+.social-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.social-btn {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 13px;
+  border: 1.5px solid #f0d5e3;
+  border-radius: 14px;
+  background: #fff;
+  font-size: 14px; font-weight: 600; color: #3a2740;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background .2s, border-color .2s;
+}
+.social-btn:hover { background: #fdf0f6; border-color: #f0b8d2; }
+.social-btn img { width: 22px; height: 22px; }
+
+.bottom-note {
+  text-align: center;
+  margin-top: 26px;
+  font-size: 14.5px;
+  color: #5a3f55;
+}
+.bottom-note a {
+  color: #e8195a;
+  font-weight: 800;
+  text-decoration: none;
+  margin-left: 4px;
+}
+.bottom-note a:hover { text-decoration: underline; }
+.bottom-note .arrow { margin-left: 2px; }
+
+/* ── FOOTER TRUST BAR ── */
+.trust-bar {
+  margin-top: 22px;
+  width: 100%;
+  max-width: 1080px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 60px;
+  padding: 0 16px;
+}
+.trust-item {
+  display: flex; align-items: center; gap: 12px;
+  flex-direction: column; text-align: center;
+}
+.trust-icon {
+  width: 36px; height: 36px;
+  color: #e8195a;
+}
+.trust-text strong { display: block; font-size: 13px; font-weight: 700; color: #3a2740; }
+.trust-text span { font-size: 12px; color: #9a7a88; }
+
+.copyright {
+  margin-top: 18px;
+  font-size: 12.5px;
+  color: #a08090;
+  text-align: center;
+}
+
+/* ── Responsive ── */
+@media (max-width: 860px) {
+  .card { grid-template-columns: 1fr; }
+  .left { padding: 36px 28px 0; }
+  .product-img-wrap img { max-width: 280px; }
+  .right { padding: 36px 28px; }
+  .trust-bar { gap: 24px; }
+}
+@media (max-width: 520px) {
+  .hero-title { font-size: 24px; }
+  .form-title { font-size: 26px; }
+  .trust-bar { gap: 16px; }
+  .trust-item { gap: 6px; }
+}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <!-- LEFT -->
+  <div class="left">
+    <div class="brand">
+      <svg class="brand-logo" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M24 6C24 6 12 14 12 26C12 32.627 17.373 38 24 38C30.627 38 36 32.627 36 26C36 14 24 6 24 6Z" fill="#e8195a" opacity="0.85"/>
+        <path d="M24 14C24 14 16 20 16 28C16 32.418 19.582 36 24 36C28.418 36 32 32.418 32 28C32 20 24 14 24 14Z" fill="#fff" opacity="0.35"/>
+        <path d="M18 16 Q24 8 30 16" stroke="#e8195a" stroke-width="2" fill="none" opacity="0.5"/>
+      </svg>
+      <div class="brand-text">
+        <span class="brand-name">Kiều Chinh</span>
+        <span class="brand-sub">Cosmetics</span>
+      </div>
+    </div>
+
+    <div class="welcome-italic">Chào mừng trở lại!</div>
+    <h1 class="hero-title">Đăng nhập để tiếp tục<br>mua sắm <em>yêu thích</em></h1>
+    <p class="hero-sub">Truy cập nhanh vào ưu đãi riêng, danh sách yêu thích và quản lý đơn hàng của bạn trên website mỹ phẩm cao cấp.</p>
+
+    <div class="features">
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#e8195a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <div class="feature-text">
+          <strong>Ưu đãi độc quyền</strong>
+          <span>Dành riêng cho thành viên</span>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#e8195a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+        </div>
+        <div class="feature-text">
+          <strong>Giao hàng nhanh chóng</strong>
+          <span>Giao hàng toàn quốc</span>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#e8195a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div class="feature-text">
+          <strong>Bảo mật tuyệt đối</strong>
+          <span>Thông tin của bạn luôn được bảo vệ</span>
+        </div>
+      </div>
+    </div>
+
+
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right">
+    <h2 class="form-title">Đăng nhập</h2>
+    <p class="form-sub">Nhập email và mật khẩu của bạn để truy cập tài khoản.</p>
+
+    <form id="loginForm" novalidate>
+      <div class="field">
+        <label class="field-label" for="email">Email</label>
+        <div class="input-wrap">
+          <span class="icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </span>
+          <input id="email" name="email" type="email" placeholder="kchinx@gmail.com" required>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="password">Mật khẩu</label>
+        <div class="input-wrap">
+          <span class="icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </span>
+          <input id="password" name="password" type="password" placeholder="Nhập mật khẩu" required>
+          <button type="button" class="eye-btn" id="togglePwd" aria-label="Hiện/ẩn mật khẩu">
+            <svg id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="options-row">
+        <label class="checkbox-label">
+          <input type="checkbox" name="remember" id="remember">
+          Ghi nhớ đăng nhập
+        </label>
+        <a href="/forgot-password" class="forgot-link">Quên mật khẩu?</a>
+      </div>
+
+      <button type="submit" class="login-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Đăng nhập
+      </button>
+
+      <div class="divider">hoặc đăng nhập với</div>
+
+      <div class="social-row">
+        <button type="button" class="social-btn">
+          <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" onerror="this.outerHTML='<span style=\'font-weight:800;font-size:16px;color:#4285F4\'>G</span>'"/>
+          Google
+        </button>
+        <button type="button" class="social-btn">
+          <img src="https://www.svgrepo.com/show/475647/facebook-color.svg" alt="Facebook" onerror="this.outerHTML='<span style=\'font-weight:800;font-size:16px;color:#1877F2\'>f</span>'"/>
+          Facebook
+        </button>
+      </div>
+    </form>
+
+    <div class="bottom-note">
+      Chưa có tài khoản?
+      <a href="/register">Đăng ký ngay <span class="arrow">›</span></a>
+    </div>
+  </div>
+</div>
+
+<!-- TRUST BAR -->
+<div class="trust-bar">
+  <div class="trust-item">
+    <svg class="trust-icon" viewBox="0 0 24 24" fill="none" stroke="#e8195a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    <div class="trust-text">
+      <strong>100% Chính hãng</strong>
+      <span>Cam kết chính hãng</span>
+    </div>
+  </div>
+  <div class="trust-item">
+    <svg class="trust-icon" viewBox="0 0 24 24" fill="none" stroke="#e8195a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.37a2 2 0 0 1 1.93-2.18h3a2 2 0 0 1 2 1.72c.13.97.36 1.92.7 2.84a2 2 0 0 1-.45 2.11L7.91 8.73a16 16 0 0 0 6 6l1.69-1.69a2 2 0 0 1 2.11-.45c.91.34 1.87.57 2.84.7A2 2 0 0 1 22 15.1v1.82z"/></svg>
+    <div class="trust-text">
+      <strong>Hỗ trợ 24/7</strong>
+      <span>Tư vấn tận tình</span>
+    </div>
+  </div>
+  <div class="trust-item">
+    <svg class="trust-icon" viewBox="0 0 24 24" fill="none" stroke="#e8195a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.51"/></svg>
+    <div class="trust-text">
+      <strong>Đổi trả dễ dàng</strong>
+      <span>Trong 7 ngày</span>
+    </div>
+  </div>
+</div>
+
+<div class="copyright">© 2024 Kiều Chinh Cosmetics. All rights reserved.</div>
+
+<script>
+// Toggle password visibility
+const togglePwd = document.getElementById('togglePwd');
+const pwdInput = document.getElementById('password');
+togglePwd.addEventListener('click', () => {
+  const isText = pwdInput.type === 'text';
+  pwdInput.type = isText ? 'password' : 'text';
+});
+
+function buildUsernameFromEmail(email) {
+  const localPart = (email || '').split('@')[0] || '';
+  return localPart.replace(/[^a-zA-Z0-9_]/g, '_').replace(/^_+|_+$/g, '') || 'user' + Date.now();
+}
+
+// Form submit
+const loginForm = document.getElementById('loginForm');
+loginForm.addEventListener('submit', async e => {
+  e.preventDefault();
+  const email = loginForm.email.value.trim();
+  const password = loginForm.password.value;
+  const remember = loginForm.remember.checked;
+  if (!email || !password) {
+    alert('Vui lòng nhập đầy đủ email và mật khẩu.');
+    return;
+  }
+  const username = buildUsernameFromEmail(email);
+  try {
+    const response = await fetch('/api/v1/header/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || 'Đăng nhập thất bại');
+    if (remember) localStorage.setItem('rememberLogin', 'true');
+    else localStorage.removeItem('rememberLogin');
+    window.location.href = '/';
+  } catch (error) {
+    alert(error.message || 'Đã xảy ra lỗi khi đăng nhập.');
+  }
+});
+</script>
+</body>
+</html>

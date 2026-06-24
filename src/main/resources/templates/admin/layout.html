@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <title th:text="${title} + ' | Admin - Kiều Chinh Cosmetics'">Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/admin.css?v=1}">
+</head>
+<body class="admin-body">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="adminSidebar" th:fragment="sidebar">
+        <div class="sidebar-brand">
+            <div class="logo"><i class="fas fa-spa"></i></div>
+            <div>
+                <h2>Kiều Chinh</h2>
+                <small>Admin</small>
+            </div>
+        </div>
+        <ul class="sidebar-menu">
+            <li class="menu-label">Tổng quan</li>
+            <li>
+                <a th:href="@{/admin/dashboard}" th:classappend="${page=='dashboard'} ? 'active' : ''">
+                    <i class="fas fa-chart-pie"></i> Dashboard
+                </a>
+            </li>
+            <li class="menu-label">Quản lý</li>
+            <li>
+                <a th:href="@{/admin/products}" th:classappend="${page=='products'} ? 'active' : ''">
+                    <i class="fas fa-box"></i> Sản phẩm
+                </a>
+            </li>
+            <li>
+                <a th:href="@{/admin/categories}" th:classappend="${page=='categories' or page=='category-trash'} ? 'active' : ''">
+                    <i class="fas fa-tags"></i> Danh mục
+                </a>
+            </li>
+            <li>
+                <a th:href="@{/admin/brands}" th:classappend="${page=='brands' or page=='brand-trash'} ? 'active' : ''">
+                    <i class="fas fa-award"></i> Thương hiệu
+                </a>
+            </li>
+            <li>
+                <a th:href="@{/admin/orders}" th:classappend="${page=='orders'} ? 'active' : ''">
+                    <i class="fas fa-shopping-bag"></i> Đơn hàng
+                </a>
+            </li>
+            <li class="menu-label">Hệ thống</li>
+            <li>
+                <a th:href="@{/admin/users}" th:classappend="${page=='users'} ? 'active' : ''">
+                    <i class="fas fa-users"></i> Người dùng
+                </a>
+            </li>
+            <li>
+                <a th:href="@{/admin/news}" th:classappend="${page=='news'} ? 'active' : ''">
+                    <i class="fas fa-newspaper"></i> Tin tức
+                </a>
+            </li>
+        </ul>
+        <div class="sidebar-footer">
+            <a th:href="@{/}"><i class="fas fa-home"></i> Về trang chủ</a>
+            <a href="#"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
+        </div>
+    </aside>
+
+    <!-- HEADER -->
+    <div class="admin-main" th:fragment="main(content)">
+        <header class="admin-header" th:fragment="topbar(title)">
+            <div style="display:flex;align-items:center;gap:12px;">
+                <button class="header-toggle" onclick="document.getElementById('adminSidebar').classList.toggle('open')">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="header-left">
+                    <h1 th:text="${title}">Dashboard</h1>
+                    <p>Quản lý cửa hàng Kiều Chinh</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <form class="header-search" th:action="@{${page == 'products' ? '/admin/products' :
+                                                       page == 'trash' ? '/admin/products/trash' :
+                                                       page == 'categories' ? '/admin/categories' :
+                                                       page == 'category-trash' ? '/admin/categories/trash' :
+                                                       page == 'brands' ? '/admin/brands' :
+                                                       page == 'brand-trash' ? '/admin/brands/trash' :
+                                                       page == 'users' ? '/admin/users' :
+                                                       page == 'orders' ? '/admin/orders' :
+                                                       page == 'news' ? '/admin/news' : '/admin/products'}}"
+                      method="get">
+                    <i class="fas fa-search"></i>
+                    <input type="text" name="keyword" th:value="${keyword}" placeholder="Tìm kiếm nhanh...">
+                </form>
+                <div class="header-icon" title="Thông báo">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge-dot"></span>
+                </div>
+                <div class="header-icon" title="Tin nhắn">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <div class="admin-user">
+                    <div class="admin-avatar">A</div>
+                    <div class="admin-user-info">
+                        <div class="name">Admin</div>
+                        <div class="role">Administrator</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <main class="admin-content" th:replace="${content}"></main>
+    </div>
+
+    <!-- MODAL HELPER -->
+    <th:block th:fragment="modalScripts">
+        <script>
+            // Mở / đóng modal
+            function openModal(id) {
+                const m = document.getElementById(id);
+                if (m) m.classList.add('active');
+            }
+            function closeModal(id) {
+                const m = document.getElementById(id);
+                if (m) m.classList.remove('active');
+            }
+            document.addEventListener('click', function (e) {
+                if (e.target.classList && e.target.classList.contains('modal-overlay')) {
+                    e.target.classList.remove('active');
+                }
+                if (e.target.closest('[data-close-modal]')) {
+                    const m = e.target.closest('.modal-overlay');
+                    if (m) m.classList.remove('active');
+                }
+            });
+
+            // Xác nhận xóa
+            function confirmDelete(message) {
+                return confirm(message || 'Bạn có chắc chắn muốn xóa?');
+            }
+
+            // Toast thông báo nhỏ
+            function showToast(text, type) {
+                type = type || 'success';
+                const t = document.createElement('div');
+                t.className = 'alert alert-' + type;
+                t.style.position = 'fixed';
+                t.style.bottom = '24px';
+                t.style.right = '24px';
+                t.style.zIndex = '9999';
+                t.style.boxShadow = '0 6px 24px rgba(0,0,0,.15)';
+                t.innerHTML = '<i class="fas fa-check-circle"></i> ' + text;
+                document.body.appendChild(t);
+                setTimeout(() => t.remove(), 2500);
+            }
+        </script>
+    </th:block>
+</body>
+</html>

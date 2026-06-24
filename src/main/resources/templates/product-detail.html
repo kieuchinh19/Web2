@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chi tiết sản phẩm - Kiều Chinh Cosmetics</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #fff;
+      color: #333;
+      line-height: 1.5;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    img {
+      display: block;
+    }
+
+    .top-bar {
+      background: #fff5f7;
+      padding: 8px 80px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #666;
+      font-size: 13px;
+    }
+
+    .top-bar span {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 80px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .logo {
+      line-height: 1.1;
+    }
+
+    .logo .logo-main {
+      font-size: 28px;
+      font-weight: 900;
+      color: #ff4f8b;
+      letter-spacing: 1px;
+    }
+
+    .logo .logo-sub {
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: #888;
+      font-weight: 600;
+    }
+
+    .search {
+      width: 460px;
+      display: flex;
+      border: 2px solid #ff4f8b;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .search input {
+      flex: 1;
+      padding: 11px 16px;
+      border: none;
+      outline: none;
+      font-size: 14px;
+      color: #333;
+    }
+
+    .search button {
+      width: 52px;
+      background: #ff4f8b;
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .header-actions .action {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 13px;
+      color: #555;
+      cursor: pointer;
+    }
+
+    .header-actions .action .action-label {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.2;
+    }
+
+    .header-actions .action .action-label span:first-child {
+      font-size: 11px;
+      color: #888;
+    }
+
+    .header-actions .action .action-label span:last-child {
+      font-size: 13px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .cart-wrapper {
+      position: relative;
+    }
+
+    .cart-badge {
+      position: absolute;
+      top: -6px;
+      right: -8px;
+      background: #ff4f8b;
+      color: white;
+      font-size: 10px;
+      font-weight: 700;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .menu {
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      border-bottom: 2px solid #eee;
+    }
+
+    .menu a {
+      text-decoration: none;
+      color: #333;
+      font-weight: 700;
+      font-size: 14px;
+      padding: 16px 32px;
+      position: relative;
+      letter-spacing: .5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .menu a.active {
+      color: #ff4f8b;
+      border-bottom: 3px solid #ff4f8b;
+      margin-bottom: -2px;
+    }
+
+    .menu a:hover {
+      color: #ff4f8b;
+    }
+
+    .badge-hot {
+      background: #ff3b30;
+      color: white;
+      font-size: 9px;
+      font-weight: 700;
+      padding: 2px 5px;
+      border-radius: 3px;
+      letter-spacing: .5px;
+    }
+
+    /* DETAIL */
+    .detail {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 30px 80px;
+    }
+
+    .breadcrumb {
+      font-size: 13px;
+      color: #888;
+      margin-bottom: 18px;
+    }
+
+    .breadcrumb a {
+      color: #ff4f8b;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      align-items: flex-start;
+    }
+
+    .detail-img {
+      background: #fff0f5;
+      border-radius: 14px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 480px;
+    }
+
+    .detail-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .detail-info h1 {
+      font-size: 28px;
+      font-weight: 900;
+      color: #222;
+      margin-bottom: 8px;
+    }
+
+    .detail-info .cat {
+      color: #ff4f8b;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .5px;
+      margin-bottom: 12px;
+    }
+
+    .detail-info .price {
+      color: #ff3b30;
+      font-size: 32px;
+      font-weight: 900;
+      margin-bottom: 14px;
+    }
+
+    .detail-info .desc {
+      color: #555;
+      font-size: 15px;
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+
+    .stock-info {
+      font-size: 14px;
+      color: #4caf50;
+      font-weight: 600;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .stock-info.low {
+      color: #ff9800;
+    }
+
+    .stock-info.out {
+      color: #f44336;
+    }
+
+    .qty-section {
+      margin-bottom: 22px;
+    }
+
+    .qty-section label {
+      font-weight: 700;
+      color: #333;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .qty-input {
+      display: inline-flex;
+      align-items: center;
+      border: 2px solid #ffd0e0;
+      border-radius: 30px;
+      overflow: hidden;
+    }
+
+    .qty-input button {
+      width: 38px;
+      height: 42px;
+      border: none;
+      background: white;
+      color: #ff4f8b;
+      font-size: 20px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .qty-input button:hover {
+      background: #fff0f5;
+    }
+
+    .qty-input input {
+      width: 60px;
+      height: 42px;
+      border: none;
+      outline: none;
+      text-align: center;
+      font-size: 16px;
+      font-weight: 700;
+      color: #333;
+    }
+
+    .btn-add-cart {
+      padding: 14px 36px;
+      background: linear-gradient(90deg, #ff4f8b, #ff7ab0);
+      color: white;
+      font-size: 16px;
+      font-weight: 800;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: .3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 6px 16px rgba(255, 79, 139, .25);
+    }
+
+    .btn-add-cart:hover:not(:disabled) {
+      background: linear-gradient(90deg, #e73c78, #ff4f8b);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px rgba(255, 79, 139, .35);
+    }
+
+    .btn-add-cart:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .btn-back {
+      margin-left: 12px;
+      padding: 13px 26px;
+      background: white;
+      color: #ff4f8b;
+      border: 2px solid #ff4f8b;
+      font-size: 14px;
+      font-weight: 700;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    .btn-back:hover {
+      background: #fff0f5;
+    }
+
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #ff4f8b;
+      color: white;
+      padding: 14px 22px;
+      border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .15);
+      z-index: 9999;
+      font-size: 14px;
+      opacity: 0;
+      transform: translateY(-20px);
+      transition: .3s;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .toast.error {
+      background: #ff3b30;
+    }
+
+    .toast.success {
+      background: #4caf50;
+    }
+
+    /* FOOTER */
+    .footer {
+      background: #fff5f7;
+      padding: 50px 80px 24px;
+      margin-top: 60px;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1.6fr 1fr 1fr 1.2fr;
+      gap: 40px;
+      padding-bottom: 36px;
+      border-bottom: 1px solid #ffe0ed;
+    }
+
+    .footer-col .fc-logo .logo-main {
+      font-size: 20px;
+      font-weight: 900;
+      color: #ff4f8b;
+    }
+
+    .footer-col .fc-logo .logo-sub {
+      font-size: 9px;
+      letter-spacing: 3px;
+      color: #888;
+    }
+
+    .footer-col p {
+      font-size: 13px;
+      color: #666;
+      line-height: 1.8;
+      margin: 12px 0 16px;
+    }
+
+    .social {
+      display: flex;
+      gap: 10px;
+    }
+
+    .social a {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: #ff4f8b;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      transition: .2s;
+    }
+
+    .social a:hover {
+      background: #e73c78;
+      transform: translateY(-2px);
+    }
+
+    .footer-col h4 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #222;
+      margin-bottom: 16px;
+    }
+
+    .footer-col ul {
+      list-style: none;
+    }
+
+    .footer-col ul li {
+      margin-bottom: 10px;
+    }
+
+    .footer-col ul li a {
+      color: #666;
+      text-decoration: none;
+      font-size: 13px;
+      transition: .2s;
+    }
+
+    .footer-col ul li a:hover {
+      color: #ff4f8b;
+      padding-left: 4px;
+    }
+
+    .contact-list {
+      list-style: none;
+    }
+
+    .contact-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 10px;
+    }
+
+    .contact-list li .ci {
+      color: #ff4f8b;
+      font-size: 15px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .footer-bottom {
+      text-align: center;
+      padding-top: 20px;
+      font-size: 13px;
+      color: #999;
+    }
+
+    @media (max-width: 1024px) {
+
+      .top-bar,
+      .header,
+      .detail,
+      .footer {
+        padding-left: 24px;
+        padding-right: 24px;
+      }
+
+      .search {
+        width: 300px;
+      }
+
+      .detail-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .detail-img {
+        height: 380px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .top-bar {
+        flex-direction: column;
+        gap: 4px;
+        padding: 8px 16px;
+      }
+
+      .header {
+        flex-direction: column;
+        gap: 14px;
+        padding: 14px 16px;
+      }
+
+      .search {
+        width: 100%;
+      }
+
+      .menu {
+        overflow-x: auto;
+        justify-content: flex-start;
+      }
+
+      .menu a {
+        padding: 14px 18px;
+        white-space: nowrap;
+      }
+
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+      }
+
+      .detail-info h1 {
+        font-size: 22px;
+      }
+
+      .detail-info .price {
+        font-size: 26px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="top-bar">
+    <span>🚚 Miễn phí vận chuyển cho đơn hàng từ 500.000đ</span>
+    <span>☎ Hotline: 0123 456 789</span>
+    <span>📍 Hệ thống cửa hàng</span>
+  </div>
+  <div class="header">
+    <a href="/" class="logo">
+      <div class="logo-main">KIỀU CHINH</div>
+      <div class="logo-sub">COSMETICS</div>
+    </a>
+    <form class="search" onsubmit="return doSearch(event)">
+      <input id="searchInput" type="text" placeholder="Tìm sản phẩm, thương hiệu...">
+      <button type="submit">🔍</button>
+    </form>
+    <div class="header-actions">
+      <a href="/login" class="action user-action">
+        <span style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="#ff4f8b" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M12 12c2.761 0 5-2.239 5-5s-2.239-5-5-5-5 2.239-5 5 2.239 5 5 5zm0 2c-3.866 0-7 3.134-7 7h2a5 5 0 0 1 10 0h2c0-3.866-3.134-7-7-7z" />
+          </svg>
+        </span>
+        <span class="action-label"><span class="user-label">Đăng nhập | Đăng ký</span></span>
+      </a>
+      <a href="/cart" class="action cart-wrapper">
+        <span style="font-size:26px;">🛒</span>
+        <span class="cart-badge">0</span>
+        <span class="action-label"><span style="font-size:11px;color:#888;">Giỏ hàng</span></span>
+      </a>
+    </div>
+  </div>
+  <div class="menu">
+    <a href="/">TRANG CHỦ</a>
+    <a href="/category/1">SẢN PHẨM</a>
+    <a href="#">THƯƠNG HIỆU</a>
+    <a href="#">KHUYẾN MÃI <span class="badge-hot">HOT</span></a>
+    <a href="#">TIN TỨC</a>
+    <a href="#">LIÊN HỆ</a>
+  </div>
+
+  <div class="detail">
+    <div class="breadcrumb">
+      <a href="/">Trang chủ</a> &nbsp;›&nbsp;
+      <a href="#" id="bcCategory">Sản phẩm</a> &nbsp;›&nbsp;
+      <span id="bcName">Đang tải...</span>
+    </div>
+    <div class="detail-grid">
+      <div class="detail-img">
+        <img id="pImage" src="" alt="product">
+      </div>
+      <div class="detail-info">
+        <div class="cat" id="pCategory">Đang tải...</div>
+        <h1 id="pName">Đang tải...</h1>
+        <div class="price" id="pPrice">0₫</div>
+        <div class="stock-info" id="pStock">⏳ Đang kiểm tra tồn kho...</div>
+        <div class="desc" id="pDesc"></div>
+
+        <div class="qty-section">
+          <label>Số lượng:</label>
+          <div class="qty-input">
+            <button type="button" onclick="changeQty(-1)">−</button>
+            <input type="number" id="qtyInput" value="1" min="1" max="999">
+            <button type="button" onclick="changeQty(1)">+</button>
+          </div>
+        </div>
+
+        <div>
+          <button class="btn-add-cart" id="btnAdd" onclick="addToCart()">🛒 Thêm vào giỏ hàng</button>
+          <button class="btn-back" onclick="history.back()">← Quay lại</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <div class="fc-logo">
+          <div class="logo-main">KIỀU CHINH</div>
+          <div class="logo-sub">COSMETICS</div>
+        </div>
+        <p>Chuyên cung cấp mỹ phẩm chính hãng<br>đến từ các thương hiệu nổi tiếng thế giới.</p>
+        <div class="social"><a href="#">f</a><a href="#">📷</a><a href="#">♪</a><a href="#">▶</a></div>
+      </div>
+      <div class="footer-col">
+        <h4>VỀ CHÚNG TÔI</h4>
+        <ul>
+          <li><a href="#">Giới thiệu</a></li>
+          <li><a href="#">Hệ thống cửa hàng</a></li>
+          <li><a href="#">Chính sách bảo mật</a></li>
+          <li><a href="#">Điều khoản sử dụng</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>HỖ TRỢ KHÁCH HÀNG</h4>
+        <ul>
+          <li><a href="#">Hướng dẫn mua hàng</a></li>
+          <li><a href="#">Chính sách giao hàng</a></li>
+          <li><a href="#">Chính sách đổi trả</a></li>
+          <li><a href="#">Câu hỏi thường gặp</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>THÔNG TIN LIÊN HỆ</h4>
+        <ul class="contact-list">
+          <li><span class="ci">📞</span> 0123 456 789</li>
+          <li><span class="ci">✉</span> support@kieuchinh.vn</li>
+          <li><span class="ci">📍</span> 123 Nguyễn Trãi, Q.1, TP.HCM</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">© 2026 Kiều Chinh Cosmetics - Mỹ phẩm chính hãng</div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    const CART_API = '/api/v1/cart';
+    const PROD_API = '/api/v1/products';
+    const HEADER_API = '/api/v1/header';
+    const cartBadge = document.querySelector('.cart-badge');
+    const userAction = document.querySelector('.user-action .user-label');
+    const toast = document.getElementById('toast');
+
+    let product = null;
+    let maxQty = 1;
+
+    function fmtVND(n) {
+      if (n == null) return '0₫';
+      return new Intl.NumberFormat('vi-VN').format(n) + '₫';
+    }
+    function showToast(msg, type) {
+      toast.textContent = msg;
+      toast.className = 'toast show ' + (type || '');
+      setTimeout(() => toast.className = 'toast', 2200);
+    }
+    async function fetchJson(url, opts = {}) {
+      const r = await fetch(url, opts);
+      const j = await r.json().catch(() => ({ status: 0, message: 'Lỗi mạng' }));
+      if (!r.ok || (j.status && j.status >= 400)) throw new Error(j.message || 'Lỗi');
+      return j;
+    }
+    function doSearch(e) {
+      e.preventDefault();
+      const q = document.getElementById('searchInput').value.trim();
+      if (q) window.location.href = '/?q=' + encodeURIComponent(q);
+      return false;
+    }
+    function getProductId() {
+      const parts = location.pathname.split('/');
+      return parts[parts.length - 1];
+    }
+
+    function changeQty(delta) {
+      const inp = document.getElementById('qtyInput');
+      let v = parseInt(inp.value || '1') + delta;
+      if (v < 1) v = 1;
+      if (v > maxQty) v = maxQty;
+      inp.value = v;
+    }
+
+    function renderProduct(p) {
+      product = p;
+      document.title = (p.name || 'Sản phẩm') + ' - Kiều Chinh Cosmetics';
+      document.getElementById('pName').textContent = p.name || 'Sản phẩm';
+      document.getElementById('bcName').textContent = p.name || '';
+      document.getElementById('pCategory').textContent = p.categoryName || (p.brandName ? 'Thương hiệu ' + p.brandName : 'Sản phẩm');
+      document.getElementById('bcCategory').textContent = p.categoryName || 'Sản phẩm';
+      document.getElementById('pPrice').textContent = fmtVND(p.price);
+      document.getElementById('pDesc').textContent = p.description || 'Sản phẩm chính hãng, chất lượng cao.';
+      const img = document.getElementById('pImage');
+      if (p.image) { img.src = p.image; img.style.display = 'block'; }
+      else { img.outerHTML = '<div style="font-size:120px;color:#ff4f8b;">💄</div>'; }
+
+      const stock = p.quantity != null ? p.quantity : 0;
+      maxQty = Math.max(1, stock);
+      document.getElementById('qtyInput').max = maxQty;
+      const stockEl = document.getElementById('pStock');
+      const btn = document.getElementById('btnAdd');
+      if (stock <= 0) {
+        stockEl.className = 'stock-info out';
+        stockEl.textContent = '✗ Hết hàng';
+        btn.disabled = true;
+        btn.textContent = 'Hết hàng';
+      } else if (stock < 5) {
+        stockEl.className = 'stock-info low';
+        stockEl.textContent = '⚠ Chỉ còn ' + stock + ' sản phẩm';
+      } else {
+        stockEl.className = 'stock-info';
+        stockEl.textContent = '✓ Còn hàng (' + stock + ' sản phẩm)';
+      }
+    }
+
+    async function loadProduct() {
+      const id = getProductId();
+      if (!id || isNaN(id)) {
+        document.querySelector('.detail-info').innerHTML = '<h1>Không tìm thấy sản phẩm</h1><a href="/" class="btn-back">Về trang chủ</a>';
+        return;
+      }
+      try {
+        const r = await fetchJson(PROD_API + '/' + id);
+        renderProduct(r.data);
+      } catch (e) {
+        document.querySelector('.detail-info').innerHTML = '<h1>Lỗi tải sản phẩm</h1><p>' + (e.message || '') + '</p>';
+      }
+    }
+
+    async function addToCart() {
+      if (!product) return;
+      const qty = parseInt(document.getElementById('qtyInput').value) || 1;
+      try {
+        const r = await fetchJson(CART_API + '/add', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ productId: product.id, quantity: qty })
+        });
+        cartBadge.textContent = r.data.count;
+        showToast('Đã thêm ' + qty + ' sản phẩm vào giỏ hàng', 'success');
+      } catch (e) {
+        showToast(e.message || 'Không thể thêm vào giỏ', 'error');
+      }
+    }
+
+    async function refreshCount() {
+      try {
+        const r = await fetchJson(CART_API + '/count');
+        cartBadge.textContent = r.data.count;
+      } catch (e) { }
+    }
+
+    async function loadUser() {
+      try {
+        const r = await fetchJson(HEADER_API + '/auth/current-user');
+        if (r.data && r.data.username) {
+          userAction.textContent = r.data.username;
+          document.querySelector('.user-action').addEventListener('click', async e => {
+            e.preventDefault();
+            if (confirm('Bạn có chắc muốn đăng xuất?')) {
+              await fetchJson(HEADER_API + '/auth/logout', { method: 'POST' });
+              location.reload();
+            }
+          });
+        }
+      } catch (e) { }
+    }
+
+    loadUser();
+    refreshCount();
+    loadProduct();
+  </script>
+</body>
+
+</html>

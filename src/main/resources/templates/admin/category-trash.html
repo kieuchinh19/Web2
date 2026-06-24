@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+
+<head th:replace="~{admin/layout :: head('Thùng rác - Danh mục')}"></head>
+
+<body class="admin-body">
+    <aside th:replace="~{admin/layout :: sidebar}"></aside>
+
+    <div class="admin-main">
+        <header th:replace="~{admin/layout :: topbar('Thùng rác - Danh mục')}"></header>
+        <main class="admin-content">
+
+            <div th:if="${message}" class="alert alert-success">
+                <i class="fas fa-check-circle"></i> <span th:text="${message}"></span>
+            </div>
+            <div th:if="${error}" class="alert alert-error">
+                <i class="fas fa-exclamation-circle"></i> <span th:text="${error}"></span>
+            </div>
+
+            <div class="page-header">
+                <div>
+                    <h2 style="font-size:18px;font-weight:700;">
+                        <i class="fas fa-trash-restore" style="color:#e11d48;"></i> Thùng rác danh mục
+                    </h2>
+                    <p style="font-size:12px;color:var(--text-muted);">
+                        Có <b th:text="${totalItems}">0</b> danh mục đã xóa tạm.
+                    </p>
+                </div>
+                <a th:href="@{/admin/categories}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Quay lại
+                </a>
+            </div>
+
+            <div class="card">
+                <form class="toolbar" th:action="@{/admin/categories/trash}" method="get">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" name="keyword" th:value="${keyword}" placeholder="Tìm danh mục đã xóa...">
+                    </div>
+                    <input type="hidden" name="size" th:value="${pageSize}">
+                    <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-search"></i> Tìm</button>
+                    <a th:href="@{/admin/categories/trash}" class="btn btn-secondary btn-sm"><i class="fas fa-redo"></i>
+                        Reset</a>
+                </form>
+
+                <div class="table-wrapper">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th style="width:60px">ID</th>
+                                <th>Tên danh mục</th>
+                                <th>Slug</th>
+                                <th>Mô tả</th>
+                                <th style="width:170px">Ngày xóa</th>
+                                <th style="width:200px">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="c : ${categories}">
+                                <td class="id-cell" th:text="${c.id}">1</td>
+                                <td>
+                                    <div class="product-name" th:text="${c.name}" style="color:#888;">Tên</div>
+                                </td>
+                                <td><code th:text="${c.slug}">slug</code></td>
+                                <td th:text="${#strings.abbreviate(c.description, 50)}">Mô tả</td>
+                                <td>
+                                    <span class="badge badge-danger" th:if="${c.deletedAt != null}">
+                                        <i class="fas fa-clock"></i>
+                                        <span th:text="${#temporals.format(c.deletedAt, 'dd/MM/yyyy HH:mm')}"></span>
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="action-btns">
+                                        <form th:action="@{/admin/categories/trash/restore/{id}(id=${c.id})}"
+                                            method="post" style="display:inline"
+                                            onsubmit="return confirmRestore('Bạn có chắc muốn khôi phục danh mục này?');">
+                                            <button type="submit" class="icon-btn edit" title="Khôi phục">
+                                                <i class="fas fa-undo"></i>
+                                            </button>
+                                        </form>
+                                        <form th:action="@{/admin/categories/trash/hard-delete/{id}(id=${c.id})}"
+                                            method="post" style="display:inline"
+                                            onsubmit="return confirmHardDelete('CẢNH BÁO: Danh mục sẽ bị xóa VĨNH VIỄN khỏi database!\nBạn có chắc chắn muốn xóa?');">
+                                            <button type="submit" class="icon-btn delete" title="Xóa vĩnh viễn">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${categories == null or categories.empty}">
+                                <td colspan="6">
+                                    <div class="empty-state">
+                                        <i class="fas fa-trash-restore"></i>
+                                        <h4>Thùng rác trống</h4>
+                                        <p>Không có danh mục nào đã bị xóa.</p>
+                                        <a th:href="@{/admin/categories}" class="btn btn-primary btn-sm"
+                                            style="margin-top:12px;">
+                                            <i class="fas fa-arrow-left"></i> Về danh sách danh mục
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="pagination" th:if="${totalPages > 1}">
+                    <a th:href="@{/admin/categories/trash(page=0, size=${pageSize}, keyword=${keyword})}"
+                        th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                        <i class="fas fa-angle-double-left"></i>
+                    </a>
+                    <a th:href="@{/admin/categories/trash(page=${currentPage - 1}, size=${pageSize}, keyword=${keyword})}"
+                        th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                        <i class="fas fa-angle-left"></i>
+                    </a>
+                    <span th:each="i : ${#numbers.sequence(pageStart, pageEnd)}">
+                        <a th:href="@{/admin/categories/trash(page=${i}, size=${pageSize}, keyword=${keyword})}"
+                            th:classappend="${i == currentPage} ? 'active' : ''" th:text="${i + 1}">1</a>
+                    </span>
+                    <a th:href="@{/admin/categories/trash(page=${currentPage + 1}, size=${pageSize}, keyword=${keyword})}"
+                        th:classappend="${currentPage + 1 >= totalPages} ? 'disabled' : ''">
+                        <i class="fas fa-angle-right"></i>
+                    </a>
+                    <a th:href="@{/admin/categories/trash(page=${totalPages - 1}, size=${pageSize}, keyword=${keyword})}"
+                        th:classappend="${currentPage + 1 >= totalPages} ? 'disabled' : ''">
+                        <i class="fas fa-angle-double-right"></i>
+                    </a>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <th:block th:replace="~{admin/layout :: modalScripts}"></th:block>
+    <script>
+        function confirmRestore(message) { return confirm(message || 'Bạn có chắc muốn khôi phục?'); }
+        function confirmHardDelete(message) { return confirm(message || 'Bạn có chắc chắn muốn xóa vĩnh viễn?'); }
+    </script>
+</body>
+
+</html>
