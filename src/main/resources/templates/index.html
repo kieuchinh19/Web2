@@ -495,74 +495,7 @@ body{background:#fff;color:#333;}
   <h2>SẢN PHẨM NỔI BẬT</h2>
   <div class="divider"><span>❤</span></div>
 </div>
-<div class="products">
-
-  <div class="product">
-    <div class="product-img-wrap">
-      <img src="https://file.hstatic.net/1000006063/file/28.2_-_thegioiskinfood_-_son_mac_retro_matte_lipstick_ruby_woo.jpg" alt="Son MAC Ruby Woo">
-      <span class="badge-discount">-10%</span>
-      <button class="btn-wishlist">♡</button>
-    </div>
-    <div class="product-body">
-      <h3>Son MAC Ruby Woo</h3>
-      <div class="stars">★★★★★ <span>(128)</span></div>
-      <div class="prices">
-        <span class="price">650.000đ</span>
-        <span class="price-old">720.000đ</span>
-      </div>
-      <button class="btn-add">🛒 THÊM VÀO GIỎ</button>
-    </div>
-  </div>
-
-  <div class="product">
-    <div class="product-img-wrap">
-      <img src="https://cdn.hstatic.net/products/200000862539/e6059bcf-267f-422f-bf2c-e3449000611c_d752d1f9f7354b769f03f71beb0dda7b_master.jpg" alt="Son Dior Addict 999">
-      <span class="badge-discount">-5%</span>
-      <button class="btn-wishlist">♡</button>
-    </div>
-    <div class="product-body">
-      <h3>Son Dior Addict 999</h3>
-      <div class="stars">★★★★★ <span>(96)</span></div>
-      <div class="prices">
-        <span class="price">950.000đ</span>
-        <span class="price-old">1.000.000đ</span>
-      </div>
-      <button class="btn-add">🛒 THÊM VÀO GIỎ</button>
-    </div>
-  </div>
-
-  <div class="product">
-    <div class="product-img-wrap">
-      <img src="https://hadoha.com/wp-content/uploads/2024/12/Nuoc-hoa-nu-Chanel-Chance-Eau-Vive-EDT-100ml.webp" alt="Nước hoa Chanel No.5">
-      <button class="btn-wishlist">♡</button>
-    </div>
-    <div class="product-body">
-      <h3>Nước hoa Chanel No.5</h3>
-      <div class="stars">★★★★½ <span>(74)</span></div>
-      <div class="prices">
-        <span class="price">3.500.000đ</span>
-      </div>
-      <button class="btn-add">🛒 THÊM VÀO GIỎ</button>
-    </div>
-  </div>
-
-  <div class="product">
-    <div class="product-img-wrap">
-      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRolka4FHTprtEQOKP4x2zl6WxXlDB1xNsALeeZKaIaKBMObBg8DKOoWto&s=10" alt="Kem dưỡng Innisfree">
-      <span class="badge-discount">-8%</span>
-      <button class="btn-wishlist">♡</button>
-    </div>
-    <div class="product-body">
-      <h3>Kem dưỡng Innisfree</h3>
-      <div class="stars">★★★★½ <span>(52)</span></div>
-      <div class="prices">
-        <span class="price">380.000đ</span>
-        <span class="price-old">410.000đ</span>
-      </div>
-      <button class="btn-add">🛒 THÊM VÀO GIỎ</button>
-    </div>
-  </div>
-
+<div class="products" id="products-grid">
 </div>
 
 <!-- NEWSLETTER -->
@@ -874,7 +807,7 @@ document.querySelectorAll('.btn-add').forEach(button => {
 
 async function addToCartById(productId) {
   try {
-    const resp = await fetchJson('/api/v1/cart/add', {
+    const resp = await fetchJson('/cart/add', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ productId: productId, quantity: 1 })
@@ -886,6 +819,54 @@ async function addToCartById(productId) {
 }
 
 loadHeaderState();
+loadHomeProducts();
+
+async function loadHomeProducts() {
+  try {
+    const resp = await fetch('/api/v1/products');
+    const json = await resp.json();
+    const products = (json.data || []).filter(p => !p.isDeleted).slice(0, 4);
+    const grid = document.getElementById('products-grid');
+    if (!grid) return;
+    grid.innerHTML = products.map(p => {
+      const updated = p.updatedAt ? Date.parse(p.updatedAt) : Date.now();
+      const imgSrc = p.image ? (p.image + '?v=' + updated) : '';
+      const price = p.price ? Number(p.price).toLocaleString('vi-VN') + 'đ' : '';
+      return `
+        <div class="product" data-id="${p.id}">
+          <div class="product-img-wrap">
+            <img src="${imgSrc}" alt="${escapeHtml(p.name)}" onerror="this.outerHTML='<span style=\\'font-size:36px\\'>💄</span>'">
+            <button class="btn-wishlist">♡</button>
+          </div>
+          <div class="product-body">
+            <h3>${escapeHtml(p.name)}</h3>
+            <div class="stars">★★★★★ <span>(0)</span></div>
+            <div class="prices">
+              <span class="price">${price}</span>
+            </div>
+            <button class="btn-add">🛒 THÊM VÀO GIỎ</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    // wire add-to-cart handlers for generated buttons
+    grid.querySelectorAll('.btn-add').forEach(button => {
+      button.addEventListener('click', () => {
+        const productEl = button.closest('.product');
+        const productId = productEl?.dataset.id ? parseInt(productEl.dataset.id) : null;
+        if (productId) addToCartById(productId);
+      });
+    });
+  } catch (err) {
+    console.warn('Load home products failed', err);
+  }
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'","&#39;");
+}
 </script>
 </body>
 </html>

@@ -5,6 +5,8 @@ import com.web2.chinh.dto.ApiResponse;
 import com.web2.chinh.dto.CartItemResponse;
 import com.web2.chinh.dto.CartResponse;
 import com.web2.chinh.dto.UpdateCartItemRequest;
+import com.web2.chinh.entity.Product;
+import com.web2.chinh.repository.ProductRepository;
 import com.web2.chinh.service.CartService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -13,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,15 +29,14 @@ public class CartController {
     private static final String SESSION_CART = "HEADER_CART";
 
     private final CartService cartService;
+    private final ProductRepository productRepository;
 
     /** Lấy toàn bộ giỏ hàng. */
     @GetMapping
     public ResponseEntity<ApiResponse<CartResponse>> getCart(HttpSession session) {
         Long userId = currentUserId(session);
         if (userId == null) {
-            // Guest: trả giỏ trống (FE dùng session cart cho guest)
-            return ResponseEntity.ok(ApiResponse.success(CartResponse.builder()
-                    .items(List.of()).totalItems(0).totalAmount(BigDecimal.ZERO).build()));
+            return ResponseEntity.ok(ApiResponse.success(buildGuestCartResponse(session)));
         }
         return ResponseEntity.ok(ApiResponse.success(cartService.getCart(userId)));
     }
@@ -195,6 +197,46 @@ public class CartController {
         Map<String, Integer> cart = getSessionCart(session);
         cart.merge("id:" + productId, qty, Integer::sum);
         session.setAttribute(SESSION_CART, cart);
+    }
+
+    private CartResponse buildGuestCartResponse(HttpSession session) {
+        Map<String, Integer> cart = getSessionCart(session);
+        List<CartItemResponse> items = new ArrayList<>();
+        BigDecimal total = BigDecimal.ZERO;
+
+        for (Map.Entry<String, Integer> entry : cart.entrySet()) {
+            String key = entry.getKey();
+            if (key == null || !key.startsWith("id:")) {
+                continue;
+            }
+            try {
+                Long productId = Long.parseLong(key.substring(3));
+                Integer qty = entry.getValue();
+                Product product = productRepository.findById(productId).orElse(null);
+                if (product == null) {
+                    continue;
+                }
+                BigDecimal price = product.getPrice() != null ? product.getPrice() : BigDecimal.ZERO;
+                BigDecimal subtotal = price.multiply(BigDecimal.valueOf(qty));
+                total = total.add(subtotal);
+                items.add(CartItemResponse.builder()
+                        .productId(product.getId())
+                        .productName(product.getName())
+                        .productImage(product.getImage())
+                        .quantity(qty)
+                        .price(price)
+                        .stockQuantity(product.getQuantity())
+                        .subtotal(subtotal)
+                        .build());
+            } catch (NumberFormatException ignored) {
+            }
+        }
+
+        return CartResponse.builder()
+                .items(items)
+                .totalItems(items.stream().mapToInt(CartItemResponse::getQuantity).sum())
+                .totalAmount(total)
+                .build();
     }
 
     private int countSessionCart(HttpSession session) {
